@@ -27,10 +27,10 @@ namespace WindowsFormsApplication1 {
 		private Vector3 delta = new Vector3();
 		private Vector3 angle_delta = new Vector3();
 		private ObjectLimit objectLimits = new ObjectLimit();
-		private int zoomX = 0;
-		private int zoomY = 0;
+		private float zoomX = 0;
+		private float zoomY = 0;
 		private float scaleKoef = 0.05f;
-		private float angle = 0;
+		private float deltaZoom = 1.0f;
 
 		public struct Limits2D {
 			public float Left, Right;
@@ -49,7 +49,7 @@ namespace WindowsFormsApplication1 {
 			RigthView,
 			IsoView
 		}
-		
+
 		public Form1() {
 			InitializeComponent();
 
@@ -70,8 +70,10 @@ namespace WindowsFormsApplication1 {
 			screenLimits.Top = pScreen.Size.Height;
 			screenLimits.Bottom = 0;
 
-			zoomX = (int)(pScreen.Size.Width * scaleKoef);
-			zoomY = (int)(pScreen.Size.Height * scaleKoef);
+			zoomX = (pScreen.Size.Width * scaleKoef);
+			zoomY = (pScreen.Size.Height * scaleKoef);
+			
+			deltaZoom = 1.0f;
 		}
 
 		public bool initializeGraphics() {
@@ -89,7 +91,7 @@ namespace WindowsFormsApplication1 {
 				MessageBox.Show(labelLog.Text);
 				return false;
 			}
-			
+
 			return true;
 		}
 		
@@ -122,26 +124,36 @@ namespace WindowsFormsApplication1 {
 				treeView1.Nodes.Add(root);
 			}
 		}*/
-				
+
 		private void setupCamera() {
 			device.Transform.Projection = Matrix.OrthoOffCenterRH(
 				screenLimits.Left, screenLimits.Right, screenLimits.Bottom, screenLimits.Top, 1111.0f, -555.0f);
-			
-			// add Camera 
+				//screenLimits.Left, screenLimits.Right, screenLimits.Bottom, screenLimits.Top, -555.0f, 1111.0f);
+
+			// add Camera
             device.Transform.View = Matrix.LookAtRH(
                 cameraLocation,
                 new Vector3(cameraLocation.X, cameraLocation.Y, 0f),
                 cameraUpVector);
-    
-            // Light not need
-            device.RenderState.Lighting = false;
-    
-            // Do not hide the reverse side of a flat figure
-            //device.RenderState.CullMode = Cull.None;
+
+			// Light not need
+            device.RenderState.Lighting = true;
             
-			float initAngleA = 0;
+            device.RenderState.Ambient = Color.White;
+            
+            // setup light
+            device.Lights[0].Type = Direct3D.LightType.Directional;
+            device.Lights[0].Diffuse = Color.White;
+            device.Lights[0].Direction = new Vector3(0, 1, 1);
+            //device.Lights[0].Commit(); // ???
+            device.Lights[0].Enabled = true;
+
+            // Do not hide the reverse side of a flat figure
+            device.RenderState.CullMode = Direct3D.Cull.None;
+
+            float initAngleA = 0;
 			float initAngleB = 0;
-			
+
 			switch (cameraView) {
 				case CameraViewType.FrontView:
 					initAngleA = (float)(Math.PI / -2);
@@ -157,7 +169,7 @@ namespace WindowsFormsApplication1 {
 				default:
 					break;
 			}
-				
+
 			device.Transform.World = Matrix.RotationYawPitchRoll(0f, initAngleA - angle_delta.Y, initAngleB - angle_delta.X);
 		}
 
@@ -171,13 +183,26 @@ namespace WindowsFormsApplication1 {
 
 			device.BeginScene();
 			
+			device.Material = new Direct3D.Material();
+
 			device.VertexFormat = Direct3D.CustomVertex.PositionColored.Format;
-			
+
 			if (allPoints.Count > 0)
 				device.DrawUserPrimitives(Direct3D.PrimitiveType.LineStrip, array.Length - 1, array);
 
 			device.EndScene();
-			
+
+			device.BeginScene();
+
+			Direct3D.Mesh mesh = Direct3D.Mesh.Sphere(device, 2f, 20, 20);
+			Direct3D.Material sphereMaterial = new Direct3D.Material();
+			sphereMaterial.Ambient = Color.Red;
+			sphereMaterial.Diffuse = Color.Red;
+			device.Material = sphereMaterial;
+			mesh.DrawSubset(0);
+
+			device.EndScene();
+
 			device.Present();
 		}
 
@@ -206,7 +231,7 @@ namespace WindowsFormsApplication1 {
 				s = textFile.ReadLine();
 				iLine++;
 				try {
-					point.Y = (float)Convert.ToDouble(s);
+					point.Y = -(float)Convert.ToDouble(s);
 					objectLimits.Front = Math.Max(point.Y, objectLimits.Front);
 					objectLimits.Back = Math.Min(point.Y, objectLimits.Back);
 				} catch {
@@ -237,29 +262,63 @@ namespace WindowsFormsApplication1 {
 				array[i].Color = Color.Black.ToArgb();
 				array[i].Position = allPoints[i];
 			}
-			
-			array[0].Color = Color.White.ToArgb();
+		}
+
+		private float getNewPosition(float a, float b, float c) {
+			float lenght = a - b;
+			float indent = (c - Math.Abs(lenght)) / 2;
+			if (Math.Abs(lenght) <= c)
+				return (a - lenght - indent);
+			return 0.0f;
 		}
 
 		private void renderNewCameraViewType(CameraViewType newView) {
 			initScreenLimits();
-			angle = 0;
 			angle_delta.X = 0;
 			angle_delta.Y = 0;
 			cameraLocation.X = 0;
 			cameraLocation.Y = 0;
 			cameraView = newView;
-			// TODO: set center view on object
-			/*if (newView == CameraViewType.TopView) {
-				float x = Math.Abs(objectLimits.Right - objectLimits.Left) * 1.1f;
-				x = pScreen.Size.Width / x * 0.05f;
-				cameraLocation.X = (float)Math.Round((double)x);
-				float y = Math.Abs(objectLimits.Top - objectLimits.Bottom) * 1.1f;
-				y = pScreen.Size.Height / x * 0.05f;
-				cameraLocation.Y = -(float)Math.Round((double)y);
-			} else if (newView == CameraViewType.RigthView) {}
-			//	cameraLocation.X = -(pScreen.Size.Width - Math.Abs(objectLimits.Left - objectLimits.Right) / 2);
-			*/
+			labelInfo.Text = "";
+			// TODO: finish center view on object
+			if (newView == CameraViewType.TopView) {
+				cameraLocation.X = getNewPosition(objectLimits.Right, objectLimits.Left, pScreen.Size.Width);
+				cameraLocation.Y = getNewPosition(objectLimits.Front, objectLimits.Back, pScreen.Size.Height);
+			} else if (newView == CameraViewType.FrontView) {
+				cameraLocation.X = getNewPosition(objectLimits.Right, objectLimits.Left, pScreen.Size.Width);
+				cameraLocation.Y = getNewPosition(objectLimits.Top, objectLimits.Bottom, pScreen.Size.Height);
+			} else if (newView == CameraViewType.RigthView) {
+				cameraLocation.X = getNewPosition(objectLimits.Front, objectLimits.Back, pScreen.Size.Width);
+				cameraLocation.Y = getNewPosition(objectLimits.Top, objectLimits.Bottom, pScreen.Size.Height);
+			} else { // IsoView
+//				while (true) {
+//					float x = objectLimits.Right - objectLimits.Left;
+//					float y = objectLimits.Top - objectLimits.Bottom;
+//					float cs, sn;
+//					cs = sn = (float)(Math.Sqrt(2) / 2);
+//					float rx = x * cs - y * sn;
+//					float ry = x * sn + y * cs;
+//					labelInfo.Text = "x=" + x.ToString() + ", y=" + y.ToString() + ", rx=" + rx.ToString() + ", ry=" + ry.ToString() + ", ";
+//					if (ry < (screenLimits.Top - screenLimits.Bottom))
+//						break;
+//					else
+//						screenLimitsPlus();
+//				}
+//				while (true) {
+//					float x = objectLimits.Right - objectLimits.Left;
+//					float y = 0;
+//					float cs, sn;
+//					cs = sn = (float)(Math.Sqrt(2) / 2);
+//					float rx = x * cs - y * sn;
+//					float ry = x * sn + y * cs;
+//					labelInfo.Text = "x=" + x.ToString() + ", y=" + y.ToString() + ", rx=" + rx.ToString() + ", ry=" + ry.ToString() + ", ";
+//					if (rx < (screenLimits.Right - screenLimits.Left))
+//						break;
+//					else
+//						screenLimitsPlus();
+//				}
+			}
+			labelInfo.Text += "Camera(" + cameraLocation.X.ToString() + ", " + cameraLocation.Y.ToString() + ")";
 			rendering();
 		}
 
@@ -287,9 +346,9 @@ namespace WindowsFormsApplication1 {
 				oldY = e.Y;
 				labelLog.Text = "Mouse position: " + e.X.ToString() + ", " + e.Y.ToString() + ", delta: " + deltaX.ToString() + ", " + deltaY.ToString() +
 					", Camera(" + cameraLocation.X.ToString() + ", " + cameraLocation.Y.ToString() + ")";
-				
-				cameraLocation.X += deltaX;
-				cameraLocation.Y -= deltaY;
+
+				cameraLocation.X += deltaX * deltaZoom;
+				cameraLocation.Y -= deltaY * deltaZoom;
 
 				rendering();
 			}
@@ -303,8 +362,6 @@ namespace WindowsFormsApplication1 {
 
 				angle_delta.X -= deltaX * 0.01f;
 				angle_delta.Y += deltaY * 0.01f;
-				
-				angle += (deltaX * 0.1f - deltaY * 0.1f);
 
 				rendering();
 			}
@@ -323,21 +380,30 @@ namespace WindowsFormsApplication1 {
 		private void pScreen_MouseUp(object sender, MouseEventArgs e) {
 		}
 
-		void pScreen_MouseWheel(object sender, MouseEventArgs e) {
-			if (e.Delta > 0) {
-				screenLimits.Left -= zoomX;
-				screenLimits.Right += zoomX;
-				screenLimits.Top += zoomY;
-				screenLimits.Bottom -= zoomY;
-			} else {
-				screenLimits.Left += zoomX;
-				screenLimits.Right -= zoomX;
-				screenLimits.Top -= zoomY;
-				screenLimits.Bottom += zoomY;
-			}
+		private void screenLimitsPlus() {
+			screenLimits.Left -= zoomX;
+			screenLimits.Right += zoomX;
+			screenLimits.Top += zoomY;
+			screenLimits.Bottom -= zoomY;
+			deltaZoom += scaleKoef*2;
+		}
 
-			labelLog.Text = "";
-			
+		private void screenLimitsMinus() {
+			screenLimits.Left += zoomX;
+			screenLimits.Right -= zoomX;
+			screenLimits.Top -= zoomY;
+			screenLimits.Bottom += zoomY;
+			deltaZoom -= scaleKoef*2;
+		}
+
+		void pScreen_MouseWheel(object sender, MouseEventArgs e) {
+			if (e.Delta > 0)
+				screenLimitsPlus();
+			else
+				screenLimitsMinus();
+
+			labelLog.Text = "Zoom: " + deltaZoom.ToString();
+
 			rendering();
 		}
 

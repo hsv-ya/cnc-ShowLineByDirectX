@@ -39,7 +39,7 @@
 			this.pScreen.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
 			this.pScreen.Location = new System.Drawing.Point(12, 118);
 			this.pScreen.Name = "pScreen";
-			this.pScreen.Size = new System.Drawing.Size(610, 415);
+			this.pScreen.Size = new System.Drawing.Size(610, 414);
 			this.pScreen.TabIndex = 0;
 			this.pScreen.Click += new System.EventHandler(this.pScreen_Click);
 			this.pScreen.Paint += new System.Windows.Forms.PaintEventHandler(this.pScreen_Paint);

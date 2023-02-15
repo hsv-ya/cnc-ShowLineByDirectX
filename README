@@ -1,1 +1,7 @@
 Show lines in window application on any object DirectX graphics.
+
+How use:
+  1) compile in SharpDevelop 4.4 or Visual Studio 2013 or high
+  2) in derectory where be created .exe put file 'Temp22.cnc'
+  3) run .exe click buttons 'Create Device', 'Load CNC'
+  4) then click on 'Top', 'Front', 'Right' or 'ISO' for view
