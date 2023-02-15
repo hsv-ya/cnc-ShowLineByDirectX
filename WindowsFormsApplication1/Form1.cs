@@ -186,21 +186,17 @@ namespace WindowsFormsApplication1 {
 		}
 
 		private void btnLoadCNC_Click(object sender, EventArgs e) {
-			bool needInitLimits = true;
 			int iLine = 0;
 			string s = "";
 			Vector3 point;
 			TextReader textFile = File.OpenText("Temp22.cnc");
 			allPoints.Clear();
+			allPoints.Add(new Vector3());
 			while ((s = textFile.ReadLine()) != null) {
 				iLine++;
 				point = new Vector3();
 				try {
 					point.X = (float)Convert.ToDouble(s);
-					if (needInitLimits) {
-						objectLimits.Left = point.X;
-						objectLimits.Right = point.X;
-					}
 					objectLimits.Right = Math.Max(point.X, objectLimits.Right);
 					objectLimits.Left = Math.Min(point.X, objectLimits.Left);
 				} catch {
@@ -211,10 +207,6 @@ namespace WindowsFormsApplication1 {
 				iLine++;
 				try {
 					point.Y = (float)Convert.ToDouble(s);
-					if (needInitLimits) {
-						objectLimits.Front = point.Y;
-						objectLimits.Back = point.Y;
-					}
 					objectLimits.Front = Math.Max(point.Y, objectLimits.Front);
 					objectLimits.Back = Math.Min(point.Y, objectLimits.Back);
 				} catch {
@@ -225,10 +217,6 @@ namespace WindowsFormsApplication1 {
 				iLine++;
 				try {
 					point.Z = (float)Convert.ToDouble(s);
-					if (needInitLimits) {
-						objectLimits.Top = point.Z;
-						objectLimits.Bottom = point.Z;
-					}
 					objectLimits.Top = Math.Max(point.Z, objectLimits.Top);
 					objectLimits.Bottom = Math.Min(point.Z, objectLimits.Bottom);
 				} catch {
@@ -236,7 +224,6 @@ namespace WindowsFormsApplication1 {
 					break;
 				}
 				allPoints.Add(point);
-				needInitLimits = false;
 			}
 			textFile.Close();
 			s += "Loaded " + allPoints.Count.ToString() + " points.";
@@ -250,6 +237,8 @@ namespace WindowsFormsApplication1 {
 				array[i].Color = Color.Black.ToArgb();
 				array[i].Position = allPoints[i];
 			}
+			
+			array[0].Color = Color.White.ToArgb();
 		}
 
 		private void renderNewCameraViewType(CameraViewType newView) {
