@@ -26,7 +26,6 @@
 			this.pScreen = new System.Windows.Forms.Panel();
 			this.btnCreateDevice = new System.Windows.Forms.Button();
 			this.labelLog = new System.Windows.Forms.Label();
-			this.button2 = new System.Windows.Forms.Button();
 			this.btnLoadCNC = new System.Windows.Forms.Button();
 			this.btnTop = new System.Windows.Forms.Button();
 			this.button5 = new System.Windows.Forms.Button();
@@ -60,22 +59,10 @@
 			// 
 			// labelLog
 			// 
-			this.labelLog.AutoSize = true;
 			this.labelLog.Location = new System.Drawing.Point(20, 9);
 			this.labelLog.Name = "labelLog";
-			this.labelLog.Size = new System.Drawing.Size(0, 13);
+			this.labelLog.Size = new System.Drawing.Size(602, 13);
 			this.labelLog.TabIndex = 2;
-			// 
-			// button2
-			// 
-			this.button2.Location = new System.Drawing.Point(281, 38);
-			this.button2.Name = "button2";
-			this.button2.Size = new System.Drawing.Size(123, 30);
-			this.button2.TabIndex = 3;
-			this.button2.Text = "Start Rendering";
-			this.button2.UseVisualStyleBackColor = true;
-			this.button2.Visible = false;
-			this.button2.Click += new System.EventHandler(this.button2_Click);
 			// 
 			// btnLoadCNC
 			// 
@@ -140,23 +127,20 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(634, 544);
+			this.ClientSize = new System.Drawing.Size(636, 544);
 			this.Controls.Add(this.labelInfo);
 			this.Controls.Add(this.button7);
 			this.Controls.Add(this.button6);
 			this.Controls.Add(this.button5);
 			this.Controls.Add(this.btnTop);
 			this.Controls.Add(this.btnLoadCNC);
-			this.Controls.Add(this.button2);
 			this.Controls.Add(this.labelLog);
 			this.Controls.Add(this.btnCreateDevice);
 			this.Controls.Add(this.pScreen);
 			this.Name = "Form1";
 			this.Text = "Show Line in window by DirectX";
-			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
 			this.ResumeLayout(false);
 			this.PerformLayout();
-
 		}
 
 		#endregion
@@ -164,7 +148,6 @@
 		private System.Windows.Forms.Panel pScreen;
 		private System.Windows.Forms.Button btnCreateDevice;
 		private System.Windows.Forms.Label labelLog;
-		private System.Windows.Forms.Button button2;
 		private System.Windows.Forms.Button btnLoadCNC;
 		private System.Windows.Forms.Button btnTop;
 		private System.Windows.Forms.Button button5;
