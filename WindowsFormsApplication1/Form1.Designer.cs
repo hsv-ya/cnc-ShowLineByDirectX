@@ -32,6 +32,7 @@
 			this.button6 = new System.Windows.Forms.Button();
 			this.button7 = new System.Windows.Forms.Button();
 			this.labelInfo = new System.Windows.Forms.Label();
+			this.listBox1 = new System.Windows.Forms.ListBox();
 			this.SuspendLayout();
 			// 
 			// pScreen
@@ -39,7 +40,7 @@
 			this.pScreen.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
 			this.pScreen.Location = new System.Drawing.Point(12, 118);
 			this.pScreen.Name = "pScreen";
-			this.pScreen.Size = new System.Drawing.Size(610, 414);
+			this.pScreen.Size = new System.Drawing.Size(610, 407);
 			this.pScreen.TabIndex = 0;
 			this.pScreen.Click += new System.EventHandler(this.pScreen_Click);
 			this.pScreen.Paint += new System.Windows.Forms.PaintEventHandler(this.pScreen_Paint);
@@ -123,11 +124,20 @@
 			this.labelInfo.TabIndex = 6;
 			this.labelInfo.Text = "label1";
 			// 
+			// listBox1
+			// 
+			this.listBox1.FormattingEnabled = true;
+			this.listBox1.Location = new System.Drawing.Point(629, 118);
+			this.listBox1.Name = "listBox1";
+			this.listBox1.Size = new System.Drawing.Size(274, 407);
+			this.listBox1.TabIndex = 7;
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(636, 544);
+			this.ClientSize = new System.Drawing.Size(915, 536);
+			this.Controls.Add(this.listBox1);
 			this.Controls.Add(this.labelInfo);
 			this.Controls.Add(this.button7);
 			this.Controls.Add(this.button6);
@@ -142,6 +152,7 @@
 			this.ResumeLayout(false);
 			this.PerformLayout();
 		}
+		private System.Windows.Forms.ListBox listBox1;
 
 		#endregion
 
